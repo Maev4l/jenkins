@@ -1,0 +1,15 @@
+pipeline-github-lib:latest
+pipeline-stage-view:latest
+ssh-slaves:latest
+timestamper:latest
+rebuild:latest
+docker-workflow:latest
+github:latest
+credentials-binding:latest
+configuration-as-code:latest
+matrix-auth:latest
+pam-auth:latest
+authorize-project:latest
+github-branch-source:latest
+workflow-aggregator:latest
+ansicolor:latest

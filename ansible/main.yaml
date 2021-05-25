@@ -1,0 +1,30 @@
+---
+- name: Provision with Jenkins
+  hosts: all
+  vars:
+    docker_repo_url: https://download.docker.com/linux
+    docker_group: "docker"
+    jenkins_image: "671123374425.dkr.ecr.eu-central-1.amazonaws.com/jenkins:1.0"
+    proxy_image: "jwilder/nginx-proxy:0.9-alpine"
+    jenkins_home_host_folder: "/data/shared/jenkins_home"
+    secrets_folder: "/data/shared/secrets"
+    docker_data_folder: "/data/docker-data"
+    proxy_configuration_folder: "/data/proxy"
+    certificates_bucket_name: "letsencrypt-lambda-storage"
+    domain: "isnan.eu"
+    jenkins_username:
+    jenkins_userpassword:
+    secrets:
+      - full
+      - certificateKey
+
+  tasks:
+    - name: Setup EC2 instance
+      include: setup.yaml
+    - name: Install Docker
+      include: docker.yaml
+    - name: Install Jenkins
+      include: jenkins.yaml
+      when:
+        - jenkins_username is defined and jenkins_username != '' and jenkins_username != None
+        - jenkins_userpassword is defined and jenkins_userpassword != '' and jenkins_userpassword != None

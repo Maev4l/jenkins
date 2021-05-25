@@ -1,0 +1,86 @@
+---
+- name: Create folder for certificates
+  become: true
+  file:
+    path: "{{ secrets_folder }}"
+    state: directory
+    owner: "{{ ansible_user}}"
+    group: "{{ ansible_user}}"
+
+- name: Download certificate from S3
+  amazon.aws.aws_s3:
+    bucket: "{{ certificates_bucket_name }}"
+    object: "/full"
+    dest: "{{ secrets_folder }}/{{ domain }}.crt"
+    mode: get
+    overwrite: different
+
+- name: Download certificate key from S3
+  amazon.aws.aws_s3:
+    bucket: "{{ certificates_bucket_name }}"
+    object: "/certificateKey"
+    dest: "{{ secrets_folder }}/{{ domain }}.key"
+    mode: get
+    overwrite: different
+
+- name: NGINX proxy configuration (1)
+  become: true
+  file:
+    path: "{{ proxy_configuration_folder }}"
+    state: directory
+    owner: "{{ ansible_user}}"
+    group: "{{ ansible_user}}"
+
+- name: NGINX proxy configuration (2)
+  copy:
+    src: "my_proxy.conf"
+    dest: "{{ proxy_configuration_folder }}/my_proxy.conf"
+
+- name: Start NGINX proxy
+  docker_container:
+    name: nginx-reverse-proxy
+    image: "{{ proxy_image }}"
+    pull: yes
+    detach: true
+    state: started
+    recreate: yes
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - "{{ proxy_configuration_folder }}/my_proxy.conf:/etc/nginx/conf.d/my_proxy.conf:ro"
+      - "{{ secrets_folder }}:/etc/nginx/certs"
+    env:
+      ENABLE_IPV6: "true"
+    ports:
+      - "80:80"
+      - "443:443"
+
+- name: Create folder for jenkins
+  become: true
+  file:
+    path: "{{ jenkins_home_host_folder }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Create Jenkins Docker container
+  docker_container:
+    name: jenkins-master
+    image: "{{ jenkins_image }}"
+    pull: yes
+    detach: yes
+    state: started
+    recreate: yes
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - "{{ jenkins_home_host_folder }}:/var/jenkins_home"
+    env:
+      VIRTUAL_HOST: "{{ domain }}"
+      VIRTUAL_PORT: "8080"
+      JENKINS_ADMIN_ID: "{{ jenkins_username }}"
+      JENKINS_ADMIN_PASSWORD: "{{ jenkins_userpassword }}"
+    exposed_ports:
+      - "8080"
+    ports:
+      - "50000:50000"
+    groups:
+      - "{{ docker_create_group_result.gid }}" # Be able to invoke docker command within the container

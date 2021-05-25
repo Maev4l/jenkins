@@ -1,0 +1,26 @@
+---
+- name: Update and upgrade apt packages
+  become: true
+  apt:
+    upgrade: "yes" # In addition to yes and no you can use dist, full, or safe, therefore it is a string
+    update_cache: yes
+
+- name: Install additional dependencies
+  become: true
+  package:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - gnupg
+      - curl
+      - python3-docker # For ansible docker_container module
+      - python3-pip
+      - amazon-ecr-credential-helper # Enable images pull from ECR
+    state: present
+
+- name: Install Python dependencies
+  pip:
+    name:
+      - botocore
+      - boto3
+    state: present

@@ -1,0 +1,67 @@
+---
+- name: Add Docker apt key
+  become: true
+  apt_key:
+    url: "{{ docker_repo_url }}/{{ ansible_distribution | lower }}/gpg"
+    id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+    state: present
+
+- name: Add Docker repository
+  become: true
+  apt_repository:
+    repo: "deb [arch=amd64] {{ docker_repo_url }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"
+    state: present
+    update_cache: true
+
+- name: Install Docker daemon
+  become: true
+  package:
+    name: docker-ce
+    state: present
+
+- name: Create folder for Docker data storage
+  become: true
+  file:
+    path: "{{ docker_data_folder }}"
+    state: directory
+
+- name: Configure Docker data storage location
+  become: true
+  template:
+    src: "daemon.json.j2"
+    dest: "/etc/docker/daemon.json"
+
+- name: Configure Docker for images pull from ECR (1)
+  file:
+    path: "~/.docker"
+    state: directory
+
+- name: Configure Docker for images pull from ECR (2)
+  copy:
+    src: "docker-config.json"
+    dest: "~/.docker/config.json"
+
+- name: Ensure Docker is started and enabled at boot (and reload)
+  become: true
+  service:
+    name: docker
+    state: restarted
+    enabled: true
+
+- name: Create "docker" group
+  become: true
+  group:
+    name: "{{ docker_group }}"
+    state: present
+  register: docker_create_group_result
+
+- name: Add "ubuntu" user to "docker" group
+  become: true
+  user:
+    name: "{{ ansible_user }}"
+    groups:
+      - "{{ docker_group }}"
+    append: yes
+
+- name: Reset ssh connection to allow user changes to affect ansible user
+  meta: reset_connection
