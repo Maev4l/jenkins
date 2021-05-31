@@ -69,7 +69,7 @@ docker build -t jenkins/python:3.8 .
 ```
 
 ```
-docker tag jenkins/nodejs:14 671123374425.dkr.ecr.eu-central-1.amazonaws.com/jenkins/python:3.8
+docker tag jenkins/python:3.8 671123374425.dkr.ecr.eu-central-1.amazonaws.com/jenkins/python:3.8
 ```
 
 ```
