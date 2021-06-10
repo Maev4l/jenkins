@@ -24,3 +24,11 @@
       - botocore
       - boto3
     state: present
+
+- name: Mount EBS volume
+  become: true
+  mount:
+    name: "{{ ec2_mount_point }}"
+    src: "{{ ebs_device_name }}"
+    fstype: "ext4"
+    state: mounted
