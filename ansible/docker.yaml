@@ -18,6 +18,7 @@
   package:
     name: docker-ce
     state: present
+    update_cache: true
 
 - name: Create folder for Docker data storage
   become: true
