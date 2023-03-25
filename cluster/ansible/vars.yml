@@ -1,0 +1,13 @@
+---
+jenkins_image: "671123374425.dkr.ecr.eu-central-1.amazonaws.com/jenkins/jenkins:latest"
+proxy_image: "jwilder/nginx-proxy:1.2.3-alpine"
+jenkins_home_host_folder: "/data/jenkins_home"
+certificates_folder: "/data/certificates"
+proxy_configuration_folder: "/data/proxy"
+domain: "isnan.eu"
+jenkins_username:
+jenkins_userpassword:
+ansible_ssh_common_args: >
+  -o ProxyCommand="ssh -W %h:%p -q ubuntu@bastion.jenkins.isnan.eu" \
+  -o ServerAliveInterval=5 \
+  -o StrictHostKeyChecking=no

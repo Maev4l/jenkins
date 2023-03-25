@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Mount the EBS volume automatically
+sleep 60 # horrible hack to wait the EBS attachment begin visible before mounting it
+mkdir ${mount_point}
+mkfs -t ext4 ${device}
+mount ${device} ${mount_point}
+echo "${device} ${mount_point}  ext4    defaults    0   0 " >> /etc/fstab
+
+# Change default storage location for docker iamges
+mkdir -p ${mount_point}/data-docker
+echo "{\"data-root\": \"${mount_point}/data-docker\"}" > /etc/docker/daemon.json 
+systemctl restart docker # take changes into account

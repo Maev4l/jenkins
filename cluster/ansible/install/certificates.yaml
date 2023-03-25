@@ -1,0 +1,24 @@
+---
+- name: Create folder for certificates
+  become: true
+  file:
+    path: "{{ certificates_folder }}"
+    state: directory
+    owner: "{{ ansible_user}}"
+    group: "{{ ansible_user}}"
+
+- name: Download certificate from S3
+  amazon.aws.aws_s3:
+    bucket: "letsencrypt-lambda-storage"
+    object: "/full"
+    dest: "{{ certificates_folder }}/{{ domain }}.crt"
+    mode: get
+    overwrite: different
+
+- name: Download certificate key from S3
+  amazon.aws.aws_s3:
+    bucket: "letsencrypt-lambda-storage"
+    object: "/certificateKey"
+    dest: "{{ certificates_folder }}/{{ domain }}.key"
+    mode: get
+    overwrite: different

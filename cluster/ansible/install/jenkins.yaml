@@ -1,0 +1,37 @@
+---
+- name: Create folder for jenkins
+  become: true
+  file:
+    path: "{{ jenkins_home_host_folder }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Get docker user gid
+  getent:
+    database: group
+    key: docker
+
+- name: Create Jenkins Docker container
+  docker_container:
+    name: jenkins-controller
+    image: "{{ jenkins_image }}"
+    pull: yes
+    detach: yes
+    state: started
+    recreate: true
+    restart_policy: "unless-stopped"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - "{{ jenkins_home_host_folder }}:/var/jenkins_home"
+    env:
+      VIRTUAL_HOST: "{{ domain }}"
+      VIRTUAL_PORT: "8080"
+      JENKINS_ADMIN_ID: "{{ jenkins_username }}"
+      JENKINS_ADMIN_PASSWORD: "{{ jenkins_userpassword }}"
+    exposed_ports:
+      - "8080"
+    ports:
+      - "50000:50000"
+    groups:
+      - "{{ getent_group['docker'][1] }}"

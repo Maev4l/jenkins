@@ -1,3 +1,13 @@
+# Jenkins
+
+## Packer
+
+Inside packer folder
+
+```shell
+packer build .
+```
+
 ## Terraform
 
 ```
@@ -12,6 +22,7 @@ terraform apply -auto-approve
 
 ```
 ansible-galaxy collection install amazon.aws
+ansible-galaxy collection install community.aws
 ```
 
 ```
@@ -19,7 +30,7 @@ ansible-inventory --inventory aws_ec2.yaml --list
 ```
 
 ```
-ansible-playbook --inventory aws_ec2.yaml main.yaml
+ansible-playbook ./install/main.yaml --extra-vars "@vars.yml" --extra-vars "jenkins_username=<admin_name> jenkins_userpassword=<admin_password>"
 ```
 
 ## Custom Docker image for Jenkins

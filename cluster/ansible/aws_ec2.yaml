@@ -2,5 +2,10 @@ plugin: aws_ec2
 regions:
   - eu-central-1
 filters:
+  instance-state-name: running
   # All instances with their `application` tag set to `jenkins`
   tag:application: jenkins
+
+keyed_groups:
+  - key: tags.role
+    separator: ""

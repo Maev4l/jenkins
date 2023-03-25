@@ -1,0 +1,15 @@
+---
+- name: Provision with Jenkins
+  hosts: controller
+  tasks:
+    - name: Setup certificates
+      include_tasks: certificates.yaml
+
+    - name: Setup Reverse Proxy
+      include_tasks: proxy.yaml
+
+    - name: Install Jenkins
+      include_tasks: jenkins.yaml
+      when:
+        - jenkins_username is defined and jenkins_username != '' and jenkins_username != None
+        - jenkins_userpassword is defined and jenkins_userpassword != '' and jenkins_userpassword != None
