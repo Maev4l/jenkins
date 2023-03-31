@@ -7,7 +7,8 @@ proxy_configuration_folder: "/data/proxy"
 domain: "isnan.eu"
 jenkins_username:
 jenkins_userpassword:
-ansible_ssh_common_args: >
-  -o ProxyCommand="ssh -W %h:%p -q ubuntu@bastion.jenkins.isnan.eu" \
-  -o ServerAliveInterval=5 \
-  -o StrictHostKeyChecking=no
+# Only needed if we go through a bastion
+#ansible_ssh_common_args: >
+#  -o ProxyCommand="ssh -W %h:%p -q ubuntu@bastion.jenkins.isnan.eu" \
+#  -o ServerAliveInterval=5 \
+#  -o StrictHostKeyChecking=no

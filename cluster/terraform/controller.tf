@@ -72,11 +72,11 @@ resource "aws_security_group" "sg_controller_instance" {
 
 // Allow only incoming SSH requests from the bastion
 resource "aws_vpc_security_group_ingress_rule" "ingress_rule_ssh_controller" {
-  security_group_id            = aws_security_group.sg_controller_instance.id
-  referenced_security_group_id = aws_security_group.sg_bastion.id
-  from_port                    = 22
-  ip_protocol                  = "tcp"
-  to_port                      = 22
+  security_group_id = aws_security_group.sg_controller_instance.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ingress_rule_https_controller" {
