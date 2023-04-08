@@ -1,0 +1,9 @@
+{
+  "name": "update-dns-record",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {
+    "serverless": "3.30.1",
+    "serverless-go-plugin": "2.2.0"
+  }
+}

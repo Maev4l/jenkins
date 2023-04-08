@@ -1,6 +1,13 @@
 # Jenkins
 
+Setup a Jenkins server
+
 ## Packer
+
+Build an AMI with:
+
+- docker
+- AWS CLI
 
 Inside packer folder
 
@@ -9,6 +16,8 @@ packer build .
 ```
 
 ## Terraform
+
+Build the infrastructure, mainly EC2 instances
 
 ```
 terraform init
@@ -19,6 +28,9 @@ terraform apply -auto-approve
 ```
 
 ## Ansible
+
+- install: Playbook to deploy a containerized Jenkins controller (behind a containerized reverse proxy)
+- start-stop: Start / Stop the EC2 instances
 
 ```
 ansible-galaxy collection install amazon.aws
@@ -86,6 +98,12 @@ docker tag jenkins/python:3.8 671123374425.dkr.ecr.eu-central-1.amazonaws.com/je
 ```
 docker push 671123374425.dkr.ecr.eu-central-1.amazonaws.com/jenkins/python:3.8
 ```
+
+## Notes
+
+The Jenkins controller instance IP address is referenced by a Route53 DNS record, therefore when the instance is restarted, we have to update the DNS record with the new allocated public IP address.
+This task is performed by an AWS Lambda function listening to the EC2 instances state change notifications.
+This saves us the cost of an Elastic IP.
 
 ## References
 
