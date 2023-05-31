@@ -118,6 +118,7 @@ resource "aws_instance" "controller" {
   tags = {
     Name = "jenkins-controller"
     role = "controller"
+    dns  = "jenkins.isnan.eu" // Use to update the dns record to this EC2 instance when the instance is restarted, via a dedicated lambda function
   }
 }
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"os"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -63,18 +64,15 @@ func handler(ctx context.Context, event events.CloudWatchEvent) {
 		return
 	}
 
-	var role, application string
+	var dns string
 	for _, tag := range dtoutput.Tags {
-
-		if *tag.Key == "application" {
-			application = *tag.Value
-		}
-		if *tag.Key == "role" {
-			role = *tag.Value
+		if *tag.Key == "dns" {
+			dns = strings.TrimSpace(*tag.Value)
+			break
 		}
 	}
 
-	if application == "jenkins" && role == "controller" {
+	if dns != "" {
 		dioutput, err := ec2client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{
 			InstanceIds: []string{instance.Id},
 		})
@@ -96,7 +94,7 @@ func handler(ctx context.Context, event events.CloudWatchEvent) {
 					{
 						Action: r53types.ChangeActionUpsert,
 						ResourceRecordSet: &r53types.ResourceRecordSet{
-							Name: aws.String("jenkins.isnan.eu"),
+							Name: aws.String(dns),
 							Type: r53types.RRTypeA,
 							TTL:  &ttl,
 							ResourceRecords: []r53types.ResourceRecord{
@@ -115,7 +113,7 @@ func handler(ctx context.Context, event events.CloudWatchEvent) {
 			return
 		}
 
-		log.Infof("DNS record 'jenkins.isnan.eu' successfully updated to: %s", address)
+		log.Infof("DNS record '%s' successfully updated to: %s", dns, address)
 	}
 }
 

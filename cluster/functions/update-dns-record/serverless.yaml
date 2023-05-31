@@ -1,4 +1,4 @@
-service: jenkins-update-dns-record
+service: update-dns-record
 
 plugins:
   - serverless-go-plugin
@@ -17,15 +17,15 @@ provider:
   iam:
     role: MyRole
   tags:
-    application: "jenkins"
+    application: "ec2-dns-updater"
     owner: "serverless"
   stackTags:
-    application: "jenkins"
+    application: "ec2-dns-updater"
     owner: "serverless"
   deploymentBucket:
     blockPublicAccess: true
     tags:
-      application: "jenkins"
+      application: "ec2-dns-updater"
       owner: "serverless"
   environment:
     REGION: ${self:provider.region}
@@ -39,7 +39,7 @@ custom:
 functions:
   update-dns-record:
     handler: cmd/main.go
-    name: jenkins-update-dns-record
+    name: ec2-dns-updater
     events:
       - eventBridge:
           pattern:
@@ -56,7 +56,7 @@ resources:
     MyRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: jenkins-auto-update-route53-record-role
+        RoleName: ec2-auto-update-route53-record-role
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -66,7 +66,7 @@ resources:
                   - lambda.amazonaws.com
               Action: sts:AssumeRole
         Policies:
-          - PolicyName: jenkins-auto-update-route53-record
+          - PolicyName: ec2-auto-update-route53-record
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -95,6 +95,6 @@ resources:
                   Resource: "*"
         Tags:
           - Key: application
-            Value: jenkins
+            Value: ec2-dns-updater
           - Key: owner
             Value: serverless
